@@ -1,0 +1,45 @@
+version: "3.3"
+services:
+  apache_spark:
+      build:
+        dockerfile: spark.dockerfile
+  spark-master:
+    image: docker.io/bitnami/spark:3.3
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+    depends_on:
+      - apache_spark
+    volumes:
+      - /mnt/data extra/apps:/opt/spark-apps
+      - /mnt/data extra/data:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    network:
+      - spark-net
+  spark-worker-a:
+    image: docker.io/bitnami/spark:3.3
+    ports:
+      - "9091:8080"
+      - "7000:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=5
+      - SPARK_WORKER_MEMORY=10G
+      - SPARK_DRIVER_MEMORY=5G
+      - SPARK_EXECUTOR_MEMORY=5G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-a
+    volumes:
+      - /mnt/data extra/apps:/opt/spark-apps
+      - /mnt/data extra/data:/opt/spark-data
+    network:
+      - spark-net
+
+volumes:
+  db:
+networks:
+  spark-net:

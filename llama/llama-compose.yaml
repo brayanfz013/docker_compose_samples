@@ -1,0 +1,25 @@
+volumes:
+  model_path: 
+    driver: local
+    driver_opts:
+      type: none
+      device: /mnt/st1/docker/llama
+      o: bind
+
+services:
+  llama-model:
+    image: ollama/ollama
+    container_name: test-model
+    ports:
+      - 11434:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+    volumes:
+      - model_path:/home
+    

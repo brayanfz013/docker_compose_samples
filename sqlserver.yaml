@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    user: '0:0'
+    container_name: sqlserver2019
+    environment:
+      SA_PASSWORD: "0913PASSword!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Express
+    ports:
+      - 1433:1433
+    volumes:
+      - db_data:/var/opt/mssql
+
+volumes:
+  db_data:

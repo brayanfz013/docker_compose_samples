@@ -1,0 +1,19 @@
+volumes:
+  db_data:
+
+services:
+  db_mysql:
+    image: mysql:8.0
+    hostname: pg
+    restart: always
+    environment:
+      - MYSQL_USER=sql
+      - MYSQL_PASSWORD=test
+      - MYSQL_ROOT_PASSWORD=test
+      - MYSQL_DATABASE=test_schema
+
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./data:/tmp/

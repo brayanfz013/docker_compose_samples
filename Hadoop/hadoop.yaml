@@ -1,0 +1,65 @@
+version: "3.2"
+services:
+
+   namenode:
+      image: apache/hadoop:3
+      hostname: namenode
+      command: ["hdfs", "namenode"]
+      ports:
+        - 9870:9870
+      env_file:
+        - ./config
+      environment:
+          ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+      volumes:
+        - namenode:/tmp/hadoop-root/dfs/data
+
+   datanode:
+      image: apache/hadoop:3
+      command: ["hdfs", "datanode"]
+      env_file:
+        - ./config
+      volumes:
+        - datanode:/tmp/hadoop-root/dfs/data
+
+   resourcemanager:
+      image: apache/hadoop:3
+      hostname: resourcemanager
+      command: ["yarn", "resourcemanager"]
+      ports:
+         - 8088:8088
+      env_file:
+        - ./config
+      volumes:
+        - resourcemanager:/tmp/hadoop-root/dfs/data
+
+   nodemanager:
+      image: apache/hadoop:3
+      command: ["yarn", "nodemanager"]
+      env_file:
+        - ./config
+
+volumes:
+  namenode:
+    external:
+      type: none
+      source: /mnt/st1/docker/hadoop/datanode
+
+  datanode:
+    external:
+      type: none
+      source: /mnt/st1/docker/hadoop/data
+
+  resourcemanager:
+    external:
+      type: none
+      source: /mnt/st1/docker/hadoop/resourcemanager
+
+
+volumes:
+  prometheus-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /disk1/prometheus-data

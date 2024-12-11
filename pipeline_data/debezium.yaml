@@ -1,0 +1,43 @@
+confluentservices:
+  debezium:
+    image: debezium/connect:latest
+    container_name: debezium
+    hostname: debezium
+    ports:
+      - '8093:8083'
+    expose:
+      - "29092"
+
+    environment:
+      BOOTSTRAP_SERVERS: broker:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: debezium
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      STATUS_STORAGE_TOPIC: connect_statuses
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      ENABLE_DEBEZIUM_SCRIPTING: 'true'
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail","-X", "GET", "http://localhost:8083/connectors"]
+
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - confluent
+
+  debezium-ui:
+    image: debezium/debezium-ui:latest
+    container_name: debezium-ui
+    hostname: debezium-ui
+    ports:
+      - '8082:8080'
+    environment:
+      KAFKA_CONNECT_URIS: http://debezium:8083
+    networks:
+      - confluent
+
+networks:
+  confluent:
